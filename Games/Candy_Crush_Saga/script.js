@@ -1,9 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     const grid = document.querySelector('.grid')
+    let score = 0
     const scoreDisplay = document.getElementById('score')
     const width = 8
     const squares = []
-    let score = 0
+    
     
     const candyColors = [
         'url(images/red-candy.png)',
@@ -14,20 +15,62 @@ document.addEventListener('DOMContentLoaded', () => {
         'url(images/blue-candy.png)'
       ]
     
+    //Kevin solution
+    function NoInitialScore(){
+      var flag = true
+      while (flag){
+        flag = false;
+        for (i = 0; i < 61; i ++) {
+          let rowOfThree = [i, i+1, i+2]
+          let decidedColor = squares[i].style.backgroundImage
+          let newcolor = Math.floor(Math.random() * candyColors.length)
+          const isBlank = squares[i].style.backgroundImage === ''
+    
+          const notValid = [6, 7, 14, 15, 22, 23, 30, 31, 38, 39, 46, 47, 54, 55]
+          if (notValid.includes(i)) continue
+    
+          if(rowOfThree.every(index => squares[index].style.backgroundImage === decidedColor && !isBlank)) {
+            while (newcolor == decidedColor){
+              newcolor = Math.floor(Math.random() * candyColors.length)
+            }
+            squares[i].style.backgroundImage = candyColors[newcolor]
+            flag = true
+          }
+        }
+
+        for (i = 0; i < 47; i ++) {
+          let columnOfThree = [i, i+width, i+width*2]
+          let decidedColor = squares[i].style.backgroundImage
+          let newcolor = Math.floor(Math.random() * candyColors.length)
+          const isBlank = squares[i].style.backgroundImage === ''
+    
+          if(columnOfThree.every(index => squares[index].style.backgroundImage === decidedColor && !isBlank)) {
+            while (newcolor == decidedColor){
+              newcolor = Math.floor(Math.random() * candyColors.length)
+            }
+            squares[i].style.backgroundImage = candyColors[newcolor]
+            flag = true
+          }
+        }
+      }
+    }
+    
     //create your board
     function createBoard() {
       for (let i = 0; i < width*width; i++) {
         const square = document.createElement('div')
         square.setAttribute('draggable', true)
         square.setAttribute('id', i)
+        //check board for threes 
         let randomColor = Math.floor(Math.random() * candyColors.length)
         square.style.backgroundImage = candyColors[randomColor]
         grid.appendChild(square)
         squares.push(square)
+        }
       }
-    }
     createBoard()
-    
+    NoInitialScore()
+
     // Dragging the Candy
     let colorBeingDragged
     let colorBeingReplaced
@@ -177,6 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Checks carried out indefintely - Add Button to clear interval for best practise, or clear on game over/game won. If you have this indefinite check you can get rid of calling the check functions above.
     window.setInterval(function(){
+      scoreDisplay.innerHTML = score
         checkRowForFour()
         checkColumnForFour()
         checkRowForThree()
